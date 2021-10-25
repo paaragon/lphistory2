@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { binary, boolean, command, flag, number, option, positional, restPositionals, run, string, subcommands } from "cmd-ts";
+import { binary, boolean, command, flag, number, oneOf, option, positional, restPositionals, run, string, subcommands } from "cmd-ts";
 import { createConfig, listConfig, removeConfig } from './commands/config';
 import { editOptions, getOptions, showOptions } from './commands/options';
 import search from './commands/search';
@@ -30,7 +30,7 @@ const searchCmd = command(
                 long: 'daemon-info',
                 short: 'd',
                 defaultValue: () => defaultOptions['daemon-info'],
-                type: string,
+                type: oneOf(['off', 'summary', 'full']),
                 description: 'off | summary | full - if off, no daemon info will be shown. If summary, only not unsent records wil be shown. If full, all daemon records will be shown.'
             }),
             lineLength: option({
@@ -185,7 +185,8 @@ const configCmd = subcommands({
     },
 });
 
-const lphistoryCmd = subcommands({
+
+const lpHistorySubcommands = subcommands({
     name: 'lphistory2',
     cmds: {
         'environment': configCmd,
@@ -193,5 +194,8 @@ const lphistoryCmd = subcommands({
         'options': optionsCmd,
     }
 });
+if (true) {
+    console.log(process.env.npm_package_version);
+}
 
-run(binary(lphistoryCmd), process.argv);
+run(binary(lpHistorySubcommands), process.argv);

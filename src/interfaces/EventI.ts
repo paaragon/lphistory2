@@ -1,4 +1,5 @@
 import { TAB } from '../utils/constants';
+import { ConversationHistoryInfo, ConversationHistoryTransfer } from './liveperson/SearchConversationResponse';
 
 const participants: { [key: string]: { id: string, loginName: string } } = {};
 
@@ -120,16 +121,21 @@ export class MessageEvent implements EventI {
 export class StartEvent implements EventI {
     date: Date;
     conversationId: string;
+    initialSkillId: string;
+    initialSkillName: string;
     eventType: EVENT_TYPE;
 
-    constructor(date: Date, conversationId: string) {
+    constructor(date: Date, info: ConversationHistoryInfo, transfers: ConversationHistoryTransfer[]) {
         this.date = date;
-        this.conversationId = conversationId;
+        this.conversationId = info.conversationId;
         this.eventType = EVENT_TYPE.START;
+        this.initialSkillId = transfers && transfers.length > 0 ? transfers[0].sourceSkillId.toString() : info.latestSkillId.toString();
+        this.initialSkillName = transfers && transfers.length > 0 ? transfers[0].sourceSkillName : info.latestSkillName;
     }
 
-    getPrintStr() {
-        return `>>> Start ${this.conversationId}`.green;
+    getPrintStr(machine?: boolean) {
+        const skill = machine ? this.initialSkillId : this.initialSkillName;
+        return `>>> Start ${this.conversationId}`.green + ' - ' + `${skill}`.yellow;
     }
 }
 
@@ -142,6 +148,7 @@ export class EndEvent implements EventI {
         this.date = date;
         this.conversationId = conversationId;
         this.eventType = EVENT_TYPE.END;
+
     }
 
     getPrintStr() {

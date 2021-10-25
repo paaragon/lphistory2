@@ -5,7 +5,7 @@ import { ConversationHistoryRecord } from '../interfaces/liveperson/SearchConver
 
 export default function buildEvents(conversation: ConversationHistoryRecord, daemonRecords: DaemonRecordI[],): EventI[] {
     const events: EventI[] = [];
-    events.push(new StartEvent(new Date(conversation.info.startTimeL), conversation.info.conversationId));
+    events.push(new StartEvent(new Date(conversation.info.startTimeL), conversation.info, conversation.transfers));
 
     if (conversation.info.endTimeL !== -1) {
         events.push(new EndEvent(new Date(conversation.info.endTimeL), conversation.info.conversationId));
