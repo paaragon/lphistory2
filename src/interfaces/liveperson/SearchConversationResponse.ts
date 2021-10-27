@@ -34,6 +34,8 @@ export interface ConversationHistoryInfo {
     latestSkillId: number;
     latestSkillName: string;
     source: string;
+    closeReason: string,
+    closeReasonDescription: string,
     mcs: number;
     alertedMCS: number;
     status: string;

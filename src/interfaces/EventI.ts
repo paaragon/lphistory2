@@ -143,16 +143,19 @@ export class EndEvent implements EventI {
     date: Date;
     conversationId: string;
     eventType: EVENT_TYPE;
+    reason: string;
+    reasonDescription: string;
 
-    constructor(date: Date, conversationId: string) {
+    constructor(date: Date, conversationId: string, reason: string, reasonDescription: string) {
         this.date = date;
         this.conversationId = conversationId;
         this.eventType = EVENT_TYPE.END;
-
+        this.reason = reason;
+        this.reasonDescription = reasonDescription;
     }
 
     getPrintStr() {
-        return `<<< End ${this.conversationId}`.red;
+        return `<<< End ${this.conversationId} - By: ${this.reason}/${this.reasonDescription}`.red;
     }
 }
 

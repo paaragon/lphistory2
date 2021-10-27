@@ -8,7 +8,7 @@ export default function buildEvents(conversation: ConversationHistoryRecord, dae
     events.push(new StartEvent(new Date(conversation.info.startTimeL), conversation.info, conversation.transfers));
 
     if (conversation.info.endTimeL !== -1) {
-        events.push(new EndEvent(new Date(conversation.info.endTimeL), conversation.info.conversationId));
+        events.push(new EndEvent(new Date(conversation.info.endTimeL), conversation.info.conversationId, conversation.info.closeReason, conversation.info.closeReasonDescription));
     }
 
     for (const msg of conversation.messageRecords) {

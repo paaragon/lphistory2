@@ -194,8 +194,5 @@ const lpHistorySubcommands = subcommands({
         'options': optionsCmd,
     }
 });
-if (true) {
-    console.log(process.env.npm_package_version);
-}
 
 run(binary(lpHistorySubcommands), process.argv);
