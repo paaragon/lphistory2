@@ -42,8 +42,7 @@ export class DaemonEvent implements EventI {
     }
 
     getPrintStr(machine: boolean) {
-        const info = machine ? this.errorCode : this.errorMsg;
-        return `${TAB}` + `[Daemon Check]`.magenta + ` ${this.sentTo} - ${info}`.grey;
+        return `${TAB}` + `[Daemon Check]`.magenta + ` ${this.sentTo} - ${this.errorCode} - ${this.errorMsg}`.grey;
     }
 
     getFillCharacter() {
