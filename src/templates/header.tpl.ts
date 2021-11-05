@@ -14,18 +14,21 @@ export default function (consumerInfo: ConsumerInfoI, lineLength: number) {
         somethingShown = true;
     }
     if (consumerInfo.lastName && consumerInfo.lastName !== 'undefined') {
-        ret += `${TAB}'Last name:'.yellow} ${consumerInfo.lastName}\n`;
+        ret += `${TAB}${'Last name:'.yellow} ${consumerInfo.lastName}\n`;
         somethingShown = true;
     }
     if (consumerInfo.email && consumerInfo.email !== 'undefined') {
-        ret += `${TAB}'Email:'.yellow} ${consumerInfo.email}\n`;
+        ret += `${TAB}${'Email:'.yellow} ${consumerInfo.email}\n`;
         somethingShown = true;
     }
     if (consumerInfo.phone && consumerInfo.phone !== 'undefined') {
-        ret += `${TAB}'Phone:'.yellow} ${consumerInfo.phone}\n`;
+        ret += `${TAB}${'Phone:'.yellow} ${consumerInfo.phone}\n`;
         somethingShown = true;
     }
 
-    ret += `\n${TAB}NO CONSUMER INFO  FOUND\n`.red;
+    if (!somethingShown) {
+        ret += `\n${TAB}NO CONSUMER INFO  FOUND\n`.red;
+    }
+
     return `${ret}\n`;
 }
