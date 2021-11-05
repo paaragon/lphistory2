@@ -14,7 +14,7 @@ export default async function search(conversationId: string, environment: string
 
     const config = getConfig(environment);
 
-    console.log('\nSearch conversation\n');
+    console.log(`\nSearching conversation: ${conversationId.yellow}\n`);
     const lpConversation: ConversationHistoryRecord = await livepersonService.getConversationHistory(conversationId, config, tShift);
 
     if (!lpConversation) {

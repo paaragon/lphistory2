@@ -12,10 +12,17 @@ export const enum EVENT_TYPE {
     PARTICIPANT = 'participant',
 }
 
+export const enum ALIGNMENT {
+    LEFT = 'left',
+    CENTER = 'center',
+}
+
 export default interface EventI {
     date: Date;
     eventType: EVENT_TYPE;
     getPrintStr: (machine: boolean) => string;
+    getFillCharacter: () => string;
+    alignment: ALIGNMENT,
 }
 
 export class DaemonEvent implements EventI {
@@ -24,6 +31,7 @@ export class DaemonEvent implements EventI {
     sentTo: string;
     errorMsg: string;
     errorCode: string;
+    alignment = ALIGNMENT.LEFT;
 
     constructor(date: Date, sentTo: string, errorMsg: string, errorCode: string) {
         this.date = date;
@@ -37,6 +45,10 @@ export class DaemonEvent implements EventI {
         const info = machine ? this.errorCode : this.errorMsg;
         return `${TAB}` + `[Daemon Check]`.magenta + ` ${this.sentTo} - ${info}`.grey;
     }
+
+    getFillCharacter() {
+        return '-'.grey;
+    }
 }
 
 export class TransferEvent implements EventI {
@@ -48,6 +60,7 @@ export class TransferEvent implements EventI {
     toId: string;
     reason: string;
     eventType: EVENT_TYPE;
+    alignment = ALIGNMENT.LEFT;
 
     constructor(date: Date, by: string, from: string, fromId: string, to: string, toId: string, reason: string) {
         this.date = date;
@@ -74,7 +87,11 @@ export class TransferEvent implements EventI {
             to = this.to;
         }
 
-        return `> ` + `[${participant}]`.yellow + ` ${from} ` + `==`.yellow + ` ${this.reason} ` + `==>`.yellow + ` ${to}`;
+        return `❯ ` + `[${participant}]`.yellow + ` ${from} ` + `→`.yellow + ` ${this.reason} `.grey + `→`.yellow + ` ${to}`;
+    }
+
+    getFillCharacter() {
+        return '-'.grey;
     }
 }
 
@@ -84,6 +101,7 @@ export class MessageEvent implements EventI {
     fromType: 'Consumer' | 'Agent';
     message: string;
     eventType: EVENT_TYPE;
+    alignment = ALIGNMENT.LEFT;
 
     constructor(date: Date, from: string, fromType: 'Consumer' | 'Agent', message: {
         msg: { text: string; }, file: { fileType: string },
@@ -116,6 +134,10 @@ export class MessageEvent implements EventI {
 
         return `${TAB}` + `${participant}` + ` ${msg}`;
     }
+
+    getFillCharacter() {
+        return '-'.grey;
+    }
 }
 
 export class StartEvent implements EventI {
@@ -124,6 +146,7 @@ export class StartEvent implements EventI {
     initialSkillId: string;
     initialSkillName: string;
     eventType: EVENT_TYPE;
+    alignment = ALIGNMENT.CENTER;
 
     constructor(date: Date, info: ConversationHistoryInfo, transfers: ConversationHistoryTransfer[]) {
         this.date = date;
@@ -135,7 +158,11 @@ export class StartEvent implements EventI {
 
     getPrintStr(machine?: boolean) {
         const skill = machine ? this.initialSkillId : this.initialSkillName;
-        return `>>> Start ${this.conversationId}`.green + ' - ' + `${skill}`.yellow;
+        return `❯❯❯ Start`.green + ` → `.yellow + `${skill}`;
+    }
+
+    getFillCharacter() {
+        return '❯'.green;
     }
 }
 
@@ -145,6 +172,7 @@ export class EndEvent implements EventI {
     eventType: EVENT_TYPE;
     reason: string;
     reasonDescription: string;
+    alignment = ALIGNMENT.CENTER;
 
     constructor(date: Date, conversationId: string, reason: string, reasonDescription: string) {
         this.date = date;
@@ -155,7 +183,11 @@ export class EndEvent implements EventI {
     }
 
     getPrintStr() {
-        return `<<< End ${this.conversationId} - By: ${this.reason}/${this.reasonDescription}`.red;
+        return `❮❮❮ End by: ${this.reason}/${this.reasonDescription}`.red;
+    }
+
+    getFillCharacter() {
+        return '❮'.red;
     }
 }
 
@@ -165,6 +197,7 @@ export class ParticipantEvent implements EventI {
     participantLoginName: string;
     permission: string;
     eventType: EVENT_TYPE;
+    alignment = ALIGNMENT.LEFT;
 
     constructor(date: Date, participantId: string, participantLoginName: string, permission: string) {
         this.date = date;
@@ -177,6 +210,10 @@ export class ParticipantEvent implements EventI {
 
     getPrintStr(machine: boolean) {
         const participant = machine ? this.participantId : this.participantLoginName;
-        return `${TAB}> ${participant}: ${this.permission}`.grey;
+        return `${TAB}❯ ${participant}: ${this.permission}`.grey;
+    }
+
+    getFillCharacter() {
+        return '-'.grey;
     }
 }

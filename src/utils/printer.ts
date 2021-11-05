@@ -2,8 +2,11 @@ import moment from 'moment';
 import 'moment-duration-format';
 import ConfigI from '../interfaces/ConfigI';
 import ConsumerInfoI from '../interfaces/ConsumerInfoI';
-import EventI, { EVENT_TYPE } from '../interfaces/EventI';
+import EventI, { ALIGNMENT, EVENT_TYPE } from '../interfaces/EventI';
 import headerTpl from '../templates/header.tpl';
+
+export const dateFormat = 'YYYY MM DD HH:mm:ssZ';
+export const dateLength = moment(new Date()).format(dateFormat).length;
 
 export function printHeader(user: ConsumerInfoI, config: ConfigI, lineLength: number) {
     const tpl = headerTpl(user, lineLength);
@@ -18,7 +21,10 @@ export function printBody(events: EventI[], lineLength: number, machine: boolean
     const maxLineLength = events.reduce((prev, curr) => curr.getPrintStr(machine).length > prev ? curr.getPrintStr(machine).length : prev, 0);
     const length = maxLineLength < lineLength ? maxLineLength : lineLength;
 
-    console.log('================================== CONVERSATION INFO ==================================>\n');
+    let title = ' CONVERSATION INFO';
+    title = padCenterAlign(title, title.length, length + dateLength, '-');
+
+    console.log(title + '\n');
 
     const firstDate = events[0].date;
 
@@ -28,24 +34,20 @@ export function printBody(events: EventI[], lineLength: number, machine: boolean
         if (machine) {
             date = event.date.getTime().toString();
         } else {
-            date = moment(event.date).format('YYYY MM DD HH:mm:ssZ');
+            date = moment(event.date).format(dateFormat);
         }
 
         if (event.eventType === EVENT_TYPE.TRANSFER) {
             console.log('\n');
         }
 
-        if (event.eventType === EVENT_TYPE.MESSAGE) {
-            const lines = getLinesFixedToLength(event.getPrintStr(machine), length, fullMsg);
-            for (let i = 0; i < lines.length; i++) {
-                if (i === 0) {
-                    console.log(`${date.grey} ${lines[i]}` + ` [${durFormatted}]`.grey);
-                } else {
-                    console.log(`${date.split('').map(() => '-'.grey).join('')} ${lines[i]} ${durFormatted.split('').map(() => '-'.grey).join('')}`);
-                }
+        const lines = getLinesFixedToLength(event.getPrintStr(machine), length, event.getFillCharacter(), event.alignment, fullMsg);
+        for (let i = 0; i < lines.length; i++) {
+            if (i === 0) {
+                console.log(`${date.grey} ${lines[i]}` + ` [${durFormatted}]`.grey);
+            } else {
+                console.log(`${date.split('').map(() => event.getFillCharacter()).join('')} ${lines[i]} ${durFormatted.split('').map(() => event.getFillCharacter()).join('')}`);
             }
-        } else {
-            console.log(`${date.grey} ${getLinesFixedToLength(event.getPrintStr(machine), length, fullMsg)}` + ` [${durFormatted}]`.grey);
         }
 
         if (event.eventType === EVENT_TYPE.END) {
@@ -54,29 +56,29 @@ export function printBody(events: EventI[], lineLength: number, machine: boolean
     }
 }
 
-function getLinesFixedToLength(str: string, maxLength: number, fullMsg: boolean): string[] {
+function getLinesFixedToLength(str: string, maxLength: number, fillCharacter: string, alignment: ALIGNMENT, fullMsg: boolean): string[] {
     const lines: string[] = [];
 
     if (!fullMsg) {
-        lines.push(getLineFixedToLength(str, maxLength, true));
+        lines.push(getLineFixedToLength(str, maxLength, fillCharacter, alignment, true));
     } else {
         const chunks = chunkWords(str, maxLength);
         for (const line of chunks) {
-            lines.push(getLineFixedToLength(line, maxLength, false));
+            lines.push(getLineFixedToLength(line, maxLength, fillCharacter, alignment, false));
         }
     }
 
     return lines;
 }
 
-function getLineFixedToLength(str: string, maxLength: number, trunc?: boolean): string {
+function getLineFixedToLength(str: string, maxLength: number, fillCharacter: string, alignment: ALIGNMENT, trunc?: boolean): string {
     let line = '';
     if (trunc) {
         line = truncLine(str, maxLength);
     } else {
         line = str;
     }
-    line = padLine(line, maxLength);
+    line = padLine(line, maxLength, fillCharacter, alignment);
 
     return line;
 }
@@ -91,16 +93,41 @@ function truncLine(str: string, maxLength: number): string {
 }
 
 
-function padLine(str: string, maxLength: number): string {
+function padLine(str: string, maxLength: number, fillCharacter: string, alignment: ALIGNMENT): string {
     const lineLength = getRealLineLength(str);
+    switch (alignment) {
+        case ALIGNMENT.LEFT:
+            return padLeftAlign(str, lineLength, maxLength, fillCharacter);
+        default:
+            return padCenterAlign(str, lineLength, maxLength, fillCharacter);
+    }
+}
+
+function padLeftAlign(str: string, lineLength: number, maxLength: number, fillCharacter: string) {
     if (lineLength < maxLength) {
         let endLines = '';
         const nEndLineChars = maxLength + (str.length - lineLength) - str.length;
         for (let i = 0; i < nEndLineChars - 1; i++) {
-            endLines += '-';
+            endLines += fillCharacter;
         }
-        return str + ' ' + endLines.grey;
-        // return (str + ' ').padEnd(maxLength + (str.length - lineLength), '-');
+        return str + ' ' + endLines;
+    }
+
+    return str;
+}
+
+export function padCenterAlign(str: string, lineLength: number, maxLength: number, fillCharacter: string) {
+    if (lineLength < maxLength) {
+        let endChars = '';
+        let startChars = '';
+        const nPadChars = maxLength + (str.length - lineLength) - str.length;
+        for (let i = 0; i < nPadChars / 2; i++) {
+            endChars += fillCharacter;
+        }
+        for (let i = 0; i < nPadChars / 2 - 1; i++) {
+            startChars += fillCharacter;
+        }
+        return startChars + str + ' ' + endChars;
     }
 
     return str;
