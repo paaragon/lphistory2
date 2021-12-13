@@ -67,6 +67,9 @@ export interface ConversationHistoryMessageRecord {
         file: {
             fileType: string;
         },
+        richContent: {
+            content: string;
+        },
     };
     messageId: string;
     audience: string;

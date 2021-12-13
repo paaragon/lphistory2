@@ -50,6 +50,13 @@ export class DaemonEvent implements EventI {
     }
 }
 
+interface RichElementI {
+    type: 'text' | 'button',
+    text: string,
+    title: string,
+    tag: 'title' | 'subtitle' | 'footer'
+}
+
 export class TransferEvent implements EventI {
     date: Date;
     by: string;
@@ -103,13 +110,16 @@ export class MessageEvent implements EventI {
     alignment = ALIGNMENT.LEFT;
 
     constructor(date: Date, from: string, fromType: 'Consumer' | 'Agent', message: {
-        msg: { text: string; }, file: { fileType: string },
+        msg: { text: string; }, file: { fileType: string }, richContent: { content: string }
     }) {
         this.date = date;
         this.from = from;
         this.fromType = fromType;
         if (message.file) {
             this.message = `[${message.file.fileType} ADJUNTO]`;
+        } else if (message.richContent) {
+            const content: { elements: RichElementI[] } = JSON.parse(message.richContent.content);
+            this.message = this.buildRichContent(content.elements);
         } else {
             this.message = message.msg.text;
         }
@@ -136,6 +146,21 @@ export class MessageEvent implements EventI {
 
     getFillCharacter() {
         return '-'.grey;
+    }
+
+    buildRichContent(elements: RichElementI[]): string {
+        let ret = '';
+        for (const element of elements) {
+            if (element.tag === 'title') {
+                continue;
+            } else if (element.type === 'button') {
+                ret += `[${element.title}]`.cyan + ' ';
+            } else {
+                ret += element.text + ' ';
+            }
+        }
+
+        return ret.trim();
     }
 }
 
