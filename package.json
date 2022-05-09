@@ -54,6 +54,6 @@
   },
   "files": [
     "lib/**/*",
-    "config/**/*"
+    "config/options.json"
   ]
 }
