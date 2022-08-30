@@ -20,6 +20,7 @@ export const enum ALIGNMENT {
 export default interface EventI {
     date: Date;
     eventType: EVENT_TYPE;
+    getLineLength: () => number;
     getPrintStr: (machine: boolean) => string;
     getFillCharacter: () => string;
     alignment: ALIGNMENT,
@@ -39,6 +40,10 @@ export class DaemonEvent implements EventI {
         this.eventType = EVENT_TYPE.DAEMON;
         this.errorMsg = errorMsg;
         this.errorCode = errorCode;
+    }
+
+    getLineLength() {
+        
     }
 
     getPrintStr(machine: boolean) {

@@ -18,7 +18,7 @@ export function printBody(events: EventI[], lineLength: number, machine: boolean
         return;
     }
 
-    const maxLineLength = events.reduce((prev, curr) => curr.getPrintStr(machine).length > prev ? curr.getPrintStr(machine).length : prev, 0);
+    const maxLineLength = events.reduce((prev, curr) => curr.getLineLength() > prev ? curr.getLineLength() : prev, 0);
     const length = maxLineLength < lineLength ? maxLineLength : lineLength;
 
     let title = ' CONVERSATION INFO';
