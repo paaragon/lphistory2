@@ -4,3 +4,4 @@ config/*
 !config/options.json
 .DS_Store
 coverage
+.vscode
