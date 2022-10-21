@@ -34,7 +34,7 @@ export function printBody(events: EventI[], lineLength: number, machine: boolean
 
     for (const event of events) {
         const durFormatted = moment.duration(event.date.getTime() - firstDate.getTime(), 'milliseconds').format('Y[y] M[m] D[d] H[h] m[m] s[s]');
-        let date: string = machine ? event.date.getTime().toString() : moment(event.date).format(dateFormat);
+        const date: string = machine ? event.date.getTime().toString() : moment(event.date).format(dateFormat);
 
         if (event.eventType === EVENT_TYPE.TRANSFER) {
             console.log('\n');
@@ -137,13 +137,12 @@ export function padCenterAlign(str: string, lineLength: number, maxLength: numbe
         for (let i = 0; i < nPadChars / 2 - 1; i++) {
             startChars += fillCharacter;
         }
-        
+
         return startChars + str + ' ' + endChars;
     }
 
     return str;
 }
-
 
 function getRealLine(str: string): string {
     return str.replace(/<color:(.*?)>/g, '');
