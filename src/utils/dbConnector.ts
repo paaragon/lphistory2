@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 
-async function connect(host: string, port: string, database: string, user: string, password: string) {
+async function connect(host: string, port: string, database: string, user: string, password: string, schema: string) {
   const client = new Client({
     host,
     port: parseInt(port, 10),
@@ -13,6 +13,7 @@ async function connect(host: string, port: string, database: string, user: strin
   });
 
   await client.connect();
+  await client.query(`SET search_path TO ${schema}`);
 
   return client;
 }

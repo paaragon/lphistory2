@@ -10,5 +10,6 @@ export default interface ConfigI {
         database: string;
         user: string;
         password: string;
+        schema: string
     }
 }

@@ -117,6 +117,8 @@ export async function configProcess(env: string): Promise<void> {
     const pgDb: string = await question('Enter your PostgreSQL database: ');
     const pgUSer: string = await question('Enter your PostgreSQL user: ');
     const pgPss: string = await question('Enter your PostgreSQL password: ');
+    const pgSchema: string = await question('Enter your PostgreSQL schema: ');
+
 
     console.log(`\nEnvironment ${env.green} created`);
 
@@ -132,8 +134,9 @@ export async function configProcess(env: string): Promise<void> {
             database: pgDb,
             user: pgUSer,
             password: pgPss,
-        },
-    };
+            schema: pgSchema
+        }
+    }
 
     const cPath = configPath(env);
     fs.writeFileSync(cPath, JSON.stringify(config));

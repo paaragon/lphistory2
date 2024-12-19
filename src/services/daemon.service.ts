@@ -15,6 +15,7 @@ export default {
             config.pg.database,
             config.pg.user,
             config.pg.password,
+            config.pg.schema
         );
 
         let query = 'select * from tdaemonwsp_tasklog_v2 where conversation_id = $1';
